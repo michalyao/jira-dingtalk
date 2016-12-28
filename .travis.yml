@@ -1,0 +1,53 @@
+sudo: required
+
+language: java
+
+jdk:
+  - oraclejdk8
+
+services:
+  - docker
+
+# docker and docker compose support
+before_install:
+  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+
+# build
+script:
+  - mvn package
+  - docker build -t michalix/jira-dingtalk .
+
+# push
+after_script:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker push michalix/jira-dingtalk ;
+    fi
+
+# deploy
+deploy:
+  provider: releases
+  api_key: $GIT_OAUTH_TOKEN
+  file: target/vrdg-1.0-fat.jar
+  skip_cleanup: true
+  on:
+    tags: true
+
+# -
+#    provider: script
+#    script: .travis/deploy.sh
+#    on:
+#      repo: ExampleOrg/my-library
+#      branch: master
+#      jdk: oraclejdk8
+#-
+#    provider: script
+#    script: .travis/deploy.sh
+#    on:
+#      repo: ExampleOrg/my-library
+#      tags: true
+#      jdk: oraclejdk8
