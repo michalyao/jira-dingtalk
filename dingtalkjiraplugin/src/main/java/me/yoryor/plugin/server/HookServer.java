@@ -1,4 +1,4 @@
-package me.yoryor.plugin.server.verticle;
+package me.yoryor.plugin.server;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
