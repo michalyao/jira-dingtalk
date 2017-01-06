@@ -4,9 +4,9 @@ import org.junit.Test;
 
 public class OaMessageTest {
     @Test
-    public String toString() {
+    public void testToString() {
 //        OaMessage oaMessage = OaMessage.builder().body()
-        return null;
+        return ;
     }
 
 }
