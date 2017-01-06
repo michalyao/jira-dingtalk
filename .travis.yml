@@ -29,13 +29,13 @@ after_script:
     fi
 
 # deploy
-deploy:
-  provider: releases
-  api_key: $GIT_OAUTH_TOKEN
-  file: target/vrdg-1.0-fat.jar
-  skip_cleanup: true
-  on:
-    tags: true
+#deploy:
+#  provider: releases
+#  api_key: $GIT_OAUTH_TOKEN
+#  file: target/dingtalk-jira-plugin-1.0.0-fat.jar
+#  skip_cleanup: true
+#  on:
+#    tags: true
 
 # -
 #    provider: script
