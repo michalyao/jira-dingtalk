@@ -4,9 +4,13 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * HTTP 服务器，负责监听JIRA的Webhook回调
@@ -44,6 +48,7 @@ public class HookServer extends AbstractVerticle {
 
     }
 
+    // TODO: 2017/1/5 增加 resolved字段，标识任务是否完成
     // 处理jsonbody
     // 处理用户，名字 name key displayName 中找到与钉钉接口中对应的名字，以实现接口的调用
     //
@@ -60,6 +65,7 @@ public class HookServer extends AbstractVerticle {
     // status -- 任务的状态
     // assignee -- 任务的分配情况
     // TODO: 2016/12/30 统一到issue对象
+    // TODO: 2017/1/6 add 影响版本，报告人，
     private JsonObject wrapJson(JsonObject bodyAsJson) {
         JsonObject issue = bodyAsJson.getJsonObject("issue");
         JsonObject issueFields = issue.getJsonObject("fields");
@@ -77,7 +83,18 @@ public class HookServer extends AbstractVerticle {
         JsonObject issueAssignObj = issueFields.getJsonObject("assignee");
         String issueAssignee = issueAssignObj == null ? "" : issueAssignObj.getString("displayName");
         String issuesStatus = issueFields.getJsonObject("status").getString("name");
-
+        String reporter = issueFields.getJsonObject("reporter").getString("name");
+        JsonArray fixVersionsJsonArray = issueFields.getJsonArray("fixVersions");
+        JsonArray versions = issueFields.getJsonArray("versions");
+        String created = issueFields.getString("created");
+        List<String> affectVersions = versions
+                .stream()
+                .map(o -> ((JsonObject) o).getString("name"))
+                .collect(Collectors.toList());
+        List<String> fixVersions = fixVersionsJsonArray
+                .stream()
+                .map(o -> ((JsonObject) o).getString("name"))
+                .collect(Collectors.toList());
         JsonObject wrapJson = new JsonObject();
 
         wrapJson.put("hook_event", event)
@@ -93,6 +110,10 @@ public class HookServer extends AbstractVerticle {
                         .put("creator", creatorName)
                         .put("url", JIRA_URL + issueId)
                         .put("description", issueDesc)
+                        .put("reporter", reporter)
+                        .put("versions", affectVersions)
+                        .put("fixVersions", fixVersions)
+                        .put("created", created)
                 );
         return wrapJson;
     }
