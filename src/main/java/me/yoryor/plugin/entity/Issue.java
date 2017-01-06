@@ -6,6 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 @Builder
 @Getter
 @ToString
@@ -31,6 +35,17 @@ public class Issue {
     private String user;
     // 任务详情地址
     private String url;
+    // 任务状态
+    private String status;
+    // 影响版本
+    private List<String> versions;
+    // 报告人
+    private String reporter;
+    // 修复版本
+    private List<String> fixVersions;
+    // 创建日期
+    private LocalDateTime created;
+
 
     public static Issue fromJson(JsonObject jsonObject) {
         return Issue.builder()
@@ -44,6 +59,11 @@ public class Issue {
                 .watcher(jsonObject.getString("watcher", ""))
                 .user(jsonObject.getString("user", ""))
                 .url(jsonObject.getString("url", ""))
+                .status(jsonObject.getString("status", ""))
+                .versions(jsonObject.getJsonArray("versions").getList())
+                .reporter(jsonObject.getString("reporter", ""))
+                .fixVersions(jsonObject.getJsonArray("fixVersions").getList())
+                .created(LocalDateTime.parse(jsonObject.getString("created"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSx")))
                 .build();
     }
 }
