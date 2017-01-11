@@ -46,7 +46,6 @@ public class Issue {
     // 创建日期
     private LocalDateTime created;
 
-
     public static Issue fromJson(JsonObject jsonObject) {
         return Issue.builder()
                 .id(jsonObject.getString("id", ""))
