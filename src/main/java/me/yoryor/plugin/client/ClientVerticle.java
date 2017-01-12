@@ -13,28 +13,9 @@ import io.vertx.core.shareddata.SharedData;
 import me.yoryor.plugin.entity.*;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.function.Function;
 
 public class ClientVerticle extends AbstractVerticle{
-    private static final String JIRA_ISSUE_CREATED = "jira:issue_created";
-    private static final String JIRA_ISSUE_UPDATED = "jira:issue_updated";
-    private static final String JIRA_ISSUE_DELETED = "jira:issue_deleted";
-
-    /************************** issue event type *****************************/
-    private static final String ISSUE_CREATED = "issue_created";
-    private static final String ISSUE_UPDATED = "issue_updated";
-    private static final String ISSUE_RESOLVED = "issue_resolved";
-    private static final String ISSUE_CLOSED = "issue_closed";
-    // 任务有新评论
-    private static final String ISSUE_COMMENTED = "issue_commented";
-    // 任务评论重新编辑
-    private static final String ISSUE_COMMENT_EDITED = "issue_comment_edited";
-    private static final String ISSUE_REOPENED = "issue_reopened";
-    private static final String ISSUE_DELETED = "issue_deleted";
-    private static final String ISSUE_GENERIC = "issue_generic";
-
-
     private static final String CORP_ID = System.getProperty("dingtalk.corpid");
     private static final String CORP_SECRET = System.getProperty("dingtalk.corpsecret");
 
@@ -58,7 +39,7 @@ public class ClientVerticle extends AbstractVerticle{
             Future<Void> userMap = dingClient.getUserMap(token);
             return userMap;
         });
-
+        // TODO: 2017/1/9 缓存失效判断 
         vertx.eventBus().<JsonObject>consumer("jira.issue.status", message -> {
             System.out.println(Json.encode(message.body()));
             JsonObject wrapBody = message.body();
@@ -67,8 +48,8 @@ public class ClientVerticle extends AbstractVerticle{
             Issue issue = Issue.fromJson(wrapBody.getJsonObject("issue"));
             String userId = userIdCache.get("姚尧");
 
-            Function<Issue, Message> function = strategy.getFuncByEventType(issueEvent);
-            dingClient.corpOaMsgTo(getTokenFromCache(), "35330198", new String[]{userId}, new String[0], function.apply(issue));
+            Function<JsonObject, Message> function = strategy.getFuncByEventType(issueEvent);
+            dingClient.corpOaMsgTo(getTokenFromCache(), "35330198", new String[]{userId}, new String[0], function.apply(wrapBody));
 
             // create an issue
 //            if (Objects.equals(hookEvent, JIRA_ISSUE_CREATED) && Objects.equals(issueEvent, ISSUE_CREATED)) {
@@ -86,13 +67,13 @@ public class ClientVerticle extends AbstractVerticle{
 ////                System.out.println(getTokenFromCache());
 //            }
             // updated an issue -- 任务分配变更
-            if (Objects.equals(hookEvent, JIRA_ISSUE_UPDATED) && Objects.equals(issueEvent, ISSUE_UPDATED)) {
-
-            }
-            // updated an issue -- 评论变更
-            if (Objects.equals(hookEvent, JIRA_ISSUE_UPDATED) && Objects.equals(issueEvent, ISSUE_COMMENTED)) {
-
-            }
+//            if (Objects.equals(hookEvent, JIRA_ISSUE_UPDATED) && Objects.equals(issueEvent, ISSUE_UPDATED)) {
+//
+//            }
+//            // updated an issue -- 评论变更
+//            if (Objects.equals(hookEvent, JIRA_ISSUE_UPDATED) && Objects.equals(issueEvent, ISSUE_COMMENTED)) {
+//
+//            }
         });
     }
 
