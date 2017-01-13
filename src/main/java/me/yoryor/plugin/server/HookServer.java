@@ -29,7 +29,8 @@ public class HookServer extends AbstractVerticle {
         router.post(CALLBACK_URL).handler(routingContext -> {
             // 获取jsonbody
             JsonObject bodyAsJson = routingContext.getBodyAsJson();
-
+            JsonObject changeLog = bodyAsJson.getJsonObject("changelog");
+            System.out.println(Json.encodePrettily(changeLog));
             JsonObject wrapJson = wrapJson(bodyAsJson);
             System.out.println(Json.encode(bodyAsJson)); // TODO: 2017/1/4 remove me plz.
 
@@ -64,8 +65,7 @@ public class HookServer extends AbstractVerticle {
     // priority -- 优先级
     // status -- 任务的状态
     // assignee -- 任务的分配情况
-    // TODO: 2016/12/30 统一到issue对象
-    // TODO: 2017/1/6 add 影响版本，报告人，
+    // TODO: 2017/1/6 增加changelog
     private JsonObject wrapJson(JsonObject bodyAsJson) {
         JsonObject issue = bodyAsJson.getJsonObject("issue");
         JsonObject issueFields = issue.getJsonObject("fields");
@@ -95,6 +95,7 @@ public class HookServer extends AbstractVerticle {
                 .stream()
                 .map(o -> ((JsonObject) o).getString("name"))
                 .collect(Collectors.toList());
+        JsonObject changelog = bodyAsJson.getJsonObject("changelog");
         JsonObject wrapJson = new JsonObject();
 
         wrapJson.put("hook_event", event)
@@ -114,7 +115,7 @@ public class HookServer extends AbstractVerticle {
                         .put("versions", affectVersions)
                         .put("fixVersions", fixVersions)
                         .put("created", created)
-                );
+                ).put("changelog", changelog);
         return wrapJson;
     }
 
