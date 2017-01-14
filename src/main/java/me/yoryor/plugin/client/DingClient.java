@@ -1,6 +1,9 @@
 package me.yoryor.plugin.client;
 
-import io.vertx.core.*;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientResponse;
@@ -10,14 +13,15 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.shareddata.LocalMap;
-import io.vertx.core.shareddata.SharedData;
 import me.yoryor.plugin.entity.Message;
 import me.yoryor.plugin.entity.MessageBody;
 import me.yoryor.plugin.entity.MessageHead;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -28,9 +32,8 @@ public class DingClient implements Closeable, DingService {
     private final LocalMap<String, String> allUsers;
 
     private static final Logger LOG = LoggerFactory.getLogger(DingClient.class);
-    private static final long CACHE_TIME = 2 * 55 * 60 * 1000l; // accessToken 缓存时间110分钟
 
-
+     
     public DingClient(Vertx vertx, HttpClientOptions options) {
         this.vertx = vertx;
         this.options = options;
