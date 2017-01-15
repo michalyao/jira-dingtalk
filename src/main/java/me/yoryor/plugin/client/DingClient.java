@@ -100,6 +100,7 @@ public class DingClient implements Closeable, DingService {
         };
     }
 
+    // TODO: 2017/1/17 可以使用抽象类来使得代码结构更优
     @Override
     public Future<String> corpMsgTo(String token, String agentId, String[] userId, String[] partyId, JsonObject msg) {
         final Future<String> result = Future.future();
@@ -119,6 +120,7 @@ public class DingClient implements Closeable, DingService {
     }
 
     // 目前OA消息支持的不是很好，主要是不能实现页面跳转，需要通过
+    @Override
     public Future<String> corpOaMsgTo(String token, String agentId, String[] userId,
                                        String[] partyId, Message message) {
         MessageBody body = message.getBody();
@@ -139,6 +141,7 @@ public class DingClient implements Closeable, DingService {
 
     }
 
+    @Override
     public Future<String> corpTextMsgTo(String token, String agentId, String[] userId, String[] partyId, String content) {
         JsonObject textMsg = new JsonObject();
         textMsg.put("msgtype", "text")
