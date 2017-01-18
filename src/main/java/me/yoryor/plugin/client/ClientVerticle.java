@@ -36,7 +36,7 @@ public class ClientVerticle extends AbstractVerticle{
         Future<Void> initTokenCache = initCache(sd);
         Future<Void> initUserMap = initTokenCache.compose(initCache -> {
             String token = getTokenFromCache();
-            Future<Void> userMap = dingClient.getUserMap(token);
+            Future<Void> userMap = dingClient.initUserMap(token);
             return userMap;
         });
         // TODO: 2017/1/9 缓存失效判断 
