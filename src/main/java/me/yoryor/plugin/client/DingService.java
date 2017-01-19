@@ -58,11 +58,11 @@ public interface DingService {
 
 
     /**
-     * 获取公司员工id与名字的映射。名字为中文
+     * 初始化公司员工id与名字的映射。名字为中文
      *
      * @param token AccessToken
      * @return a Map of users.
      */
-    Future<Void> getUserMap(String token);
+    Future<Void> initUserMap(String token);
 
 }
