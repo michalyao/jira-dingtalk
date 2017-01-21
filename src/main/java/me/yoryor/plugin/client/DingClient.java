@@ -159,7 +159,7 @@ public class DingClient implements Closeable, DingService {
     }
 
     @Override
-    public Future<Void> getUserMap(String token) {
+    public Future<Void> initUserMap(String token) {
         Future<Void> result = Future.future();
         List<Future> futures = new ArrayList<>();
         // 1. 获取公司所有部门的id
